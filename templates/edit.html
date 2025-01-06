@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Gear</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Gear</h1>
+
+        <!-- Форма редактирования с текущими значениями -->
+        <form method="post">
+            <label for="name">Gear Name:</label>
+            <input type="text" name="name" id="name" value="{{ item['name'] }}" required>
+
+            <label for="category">Category:</label>
+            <input type="text" name="category" id="category" value="{{ item['category'] }}" required>
+
+            <label for="quantity">Quantity:</label>
+            <input type="number" name="quantity" id="quantity" value="{{ item['quantity'] }}" required>
+
+            <button type="submit">Save Changes</button>
+        </form>
+
+        <br>
+        <a href="{{ url_for('index') }}">Cancel</a>
+    </div>
+</body>
+</html>

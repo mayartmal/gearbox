@@ -1,58 +1,39 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# Настройка базы данных
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gear.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+gear_list = []
 
 
-# Модель для снаряжения
-class Gear(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    category = db.Column(db.String(100), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        name = request.form['name']
+        category = request.form['category']
+        quantity = request.form['quantity']
 
-    def __repr__(self):
-        return f"<Gear {self.name}>"
+        gear_list.append({'name': name, 'category': category, 'quantity': quantity})
 
-
-# Создание базы данных
-with app.app_context():
-    db.create_all()
+    return render_template('index.html', gear_list=gear_list)
 
 
-@app.route("/")
-def home():
-    gear_list = Gear.query.all()
-    return render_template("index.html", gear=gear_list)
+@app.route('/delete/<int:index>', methods=['POST'])
+def delete(index):
+    del gear_list[index]
+    return redirect(url_for('index'))
 
 
-@app.route("/add", methods=["POST"])
-def add_gear():
-    name = request.form.get("name")
-    category = request.form.get("category")
-    quantity = request.form.get("quantity")
+@app.route('/edit/<int:index>', methods=['GET', 'POST'])
+def edit(index):
+    if request.method == 'POST':
+        gear_list[index]['name'] = request.form['name']
+        gear_list[index]['category'] = request.form['category']
+        gear_list[index]['quantity'] = request.form['quantity']
+        return redirect(url_for('index'))
 
-    if name and category and quantity:
-        new_gear = Gear(name=name, category=category, quantity=int(quantity))
-        db.session.add(new_gear)
-        db.session.commit()
-
-    return redirect(url_for("home"))
+    item = gear_list[index]
+    return render_template('edit.html', item=item, index=index)
 
 
-@app.route("/delete/<int:id>", methods=["POST"])
-def delete_gear(id):
-    gear = Gear.query.get_or_404(id)
-    db.session.delete(gear)
-    db.session.commit()
-
-    return redirect(url_for("home"))
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

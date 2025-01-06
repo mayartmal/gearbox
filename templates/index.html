@@ -1,41 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gear Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Gear Tracker</h1>
-    <p>Track your gear efficiently!</p>
+    <div class="container">
+        <h1>Gear Tracker</h1>
 
-    <h2>Add New Gear</h2>
-    <form action="/add" method="post">
-        <label for="name">Item Name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+        <!-- Форма для добавления нового снаряжения -->
+        <form method="post">
+            <label for="name">Gear Name:</label>
+            <input type="text" name="name" id="name" placeholder="Gear name" required>
 
-        <label for="category">Category:</label><br>
-        <input type="text" id="category" name="category" required><br><br>
+            <label for="category">Category:</label>
+            <input type="text" name="category" id="category" placeholder="Category" required>
 
-        <label for="quantity">Quantity:</label><br>
-        <input type="number" id="quantity" name="quantity" min="1" required><br><br>
+            <label for="quantity">Quantity:</label>
+            <input type="number" name="quantity" id="quantity" placeholder="Quantity" required>
 
-        <button type="submit">Add Gear</button>
-    </form>
+            <button type="submit">Add Gear</button>
+        </form>
 
-    <h2>Your Gear</h2>
-    {% if gear %}
+        <h2>Gear List</h2>
+
+        <!-- Список снаряжения с кнопками Edit и Delete -->
         <ul>
-        {% for item in gear %}
-            <li>
-                {{ item.name }} ({{ item.category }}) - {{ item.quantity }}
-                <form action="/delete/{{ item.id }}" method="POST" style="display:inline;">
-                    <button type="submit">Delete</button>
-                </form>
+            {% for item in gear_list %}
+            <li class="gear-item">
+                <div>
+                    <strong>{{ item['name'] }}</strong> - {{ item['category'] }} ({{ item['quantity'] }})
+                </div>
+                <div class="actions">
+                    <a href="{{ url_for('edit', index=loop.index0) }}">
+                        <button type="button">Edit</button>
+                    </a>
+                    <form method="post" action="{{ url_for('delete', index=loop.index0) }}" class="inline-form">
+                        <button type="submit">Delete</button>
+                    </form>
+                </div>
             </li>
-        {% endfor %}
+            {% endfor %}
         </ul>
-    {% else %}
-        <p>No gear added yet.</p>
-    {% endif %}
+    </div>
 </body>
 </html>
